@@ -212,7 +212,10 @@
     <p class="hint">Namig: iščemo skovanko, ki vsebuje besedo za jagodo — v njihovem primeru ima vodilno vlogo brinova jagoda.</p>
 
     <!-- Button (appears after 30s) -->
-    <button class="btn" id="helpBtn">Pomoč</button>
+    <button class="btn" id="helpBtn">Ne znam, pomagaj mi.</button>
+
+    <!-- Button 2 (appears after 2min, reveals B Y K) -->
+    <button class="btn" id="helpBtn2" style="margin-top: 0.8rem;">Potrebujem še malo dodatne pomoči.</button>
 
     <!-- Coordinates (shown on solve) -->
     <div class="coords" id="coords">
@@ -251,6 +254,7 @@
         document.getElementById('coords').classList.add('visible');
         document.getElementById('mapsBtn').classList.add('visible');
         document.getElementById('helpBtn').classList.add('hidden');
+        document.getElementById('helpBtn2').classList.add('hidden');
         launchConfetti();
       }
     }
@@ -294,6 +298,24 @@
       document.querySelector('.logo-frame').classList.add('visible');
       document.querySelector('.tagline').classList.add('visible');
       this.classList.add('hidden');
+    });
+
+    // Help2 button: show after 2 min
+    const helpBtn2 = document.getElementById('helpBtn2');
+    setTimeout(function() {
+      if (!solved) helpBtn2.classList.add('show');
+    }, 120000);
+
+    // Help2 button click: reveal B, Y, K at positions 0, 4, 7
+    helpBtn2.addEventListener('click', function() {
+      const reveals = { 0: 'B', 4: 'Y', 7: 'K' };
+      Object.entries(reveals).forEach(([idx, letter]) => {
+        const i = parseInt(idx);
+        inputs[i].value = letter;
+        inputs[i].classList.add('correct');
+      });
+      this.classList.add('hidden');
+      checkSolved();
     });
 
     // Confetti

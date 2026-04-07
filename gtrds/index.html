@@ -336,10 +336,11 @@ const TARGET = ["4","5","9","5","4","0","4","1","4","7","4","4","1","3","1"];
 
 const TASKS = [
   {
-    emoji: "🏙️", category: "ŠTART", type: "input",
-    question: "Pot se začne v Kranju. Koliko soglasnikov ima beseda KRANJ?",
+    emoji: "🏙️", category: "ŠTART", type: "choice",
+    question: "Če začneš v Kranju in ne vidiš morja, ampak vedno več gričev in vinogradov – kam greš?",
     detail: null,
-    correctValue: "4", digits: [0],
+    options: ["Na Primorsko", "Na Dolenjsko", "V Alpe"],
+    correct: "Na Dolenjsko", digits: [0],
   },
   {
     emoji: "🔤", category: "ČRKE", type: "input",

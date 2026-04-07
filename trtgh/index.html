@@ -33,13 +33,13 @@
   .container {
     max-width: 520px;
     margin: 0 auto;
-    padding: 40px 20px;
+    padding: 20px 20px;
     position: relative;
     z-index: 1;
   }
 
   /* Header */
-  .header { text-align: center; margin-bottom: 40px; }
+  .header { text-align: center; margin-bottom: 24px; }
   .header-label {
     font-size: 14px;
     letter-spacing: 6px;
@@ -113,7 +113,7 @@
     display: flex;
     gap: 6px;
     justify-content: center;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     margin-top: 24px;
   }
   .word-inputs input {
@@ -131,6 +131,29 @@
     border-radius: 4px 4px 0 0;
     transition: all 0.3s ease;
     letter-spacing: 1px;
+  }
+  .word-inputs.narrow {
+    gap: 4px;
+  }
+  .word-inputs.narrow input {
+    width: 30px;
+    height: 40px;
+    font-size: 18px;
+    border-bottom-width: 2px;
+  }
+  @media (max-width: 400px) {
+    .word-inputs input {
+      width: 34px;
+      height: 42px;
+      font-size: 20px;
+    }
+    .word-inputs.narrow input {
+      width: 28px;
+      height: 38px;
+      font-size: 16px;
+    }
+    .word-inputs { gap: 3px; }
+    .word-inputs.narrow { gap: 3px; }
   }
   .word-inputs input:focus {
     border-bottom-color: #d4a050;
@@ -220,7 +243,6 @@
 
   <!-- Header -->
   <div class="header">
-    <div class="header-label">Uganka</div>
     <h1>R E B U S</h1>
     <div class="header-line"></div>
     <p>Poglej sliko in ugani besedo.<br>Vpiši črke v polja spodaj.</p>
@@ -551,8 +573,8 @@
       </g>
     </svg>
 
-    <div class="word-inputs" id="inputs2"></div>
-    <div class="success-msg">Pravilno! To so Dolenjske! 🏞️</div>
+    <div class="word-inputs narrow" id="inputs2"></div>
+    <div class="success-msg">Pravilno! To je Dolenjska! 🏞️</div>
   </div>
 
   <!-- Victory -->

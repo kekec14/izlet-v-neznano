@@ -32,7 +32,6 @@
     overflow-x: hidden;
   }
 
-  /* Honeycomb background */
   .honeycomb-bg {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     z-index: 0; opacity: 0.05; pointer-events: none;
@@ -44,7 +43,6 @@
     padding: 20px 16px 40px;
   }
 
-  /* Header */
   .header { text-align: center; margin-bottom: 20px; }
   .header-label {
     font-size: 11px; letter-spacing: 5px; color: var(--gold);
@@ -59,7 +57,6 @@
   }
   .header p { color: var(--gold-dark); font-size: 13px; margin-top: 4px; }
 
-  /* Progress */
   .progress-wrap {
     background: rgba(42,30,10,0.8); border-radius: 20px; height: 7px;
     border: 1px solid #3d2b1f; overflow: hidden; margin-bottom: 6px;
@@ -73,7 +70,6 @@
     text-align: center; font-size: 11px; color: var(--gold-dark); margin-bottom: 18px;
   }
 
-  /* Coordinate display */
   .coords {
     display: flex; flex-wrap: wrap; justify-content: center;
     gap: 3px; padding: 12px 6px; align-items: center;
@@ -105,7 +101,6 @@
   }
   .coord-comma { margin: 0 5px; }
 
-  /* Task card */
   .task-card {
     margin-top: 22px;
     background: var(--brown-card);
@@ -114,9 +109,7 @@
     box-shadow: 0 8px 32px rgba(0,0,0,0.4);
     backdrop-filter: blur(10px);
   }
-  .task-card.shake {
-    animation: shake 0.5s ease;
-  }
+  .task-card.shake { animation: shake 0.5s ease; }
   .task-header {
     display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
   }
@@ -135,7 +128,6 @@
     margin-bottom: 16px;
   }
 
-  /* Options */
   .options { display: flex; flex-direction: column; gap: 8px; margin-top: 14px; }
   .option-btn {
     padding: 14px 18px; border-radius: 12px;
@@ -154,7 +146,6 @@
   }
   .option-btn:disabled { cursor: default; opacity: 0.7; }
 
-  /* Input */
   .input-row { display: flex; gap: 10px; margin-top: 14px; }
   .input-field {
     flex: 1; padding: 12px 16px; border-radius: 10px;
@@ -174,7 +165,6 @@
     background: #3d2b1f; color: #6B5A32; cursor: default;
   }
 
-  /* Feedback */
   .feedback {
     margin-top: 14px; padding: 10px 16px; border-radius: 10px;
     font-size: 14px; text-align: center; font-weight: 700;
@@ -187,7 +177,6 @@
     background: rgba(255,107,107,0.12); border: 1px solid var(--red); color: var(--red);
   }
 
-  /* Final reveal */
   .reveal { margin-top: 32px; text-align: center; }
   .reveal-step { animation: slideUp 0.6s ease both; }
   .reveal-big-emoji { font-size: 52px; margin-bottom: 8px; }
@@ -223,13 +212,11 @@
   }
   .maps-btn:active { transform: scale(0.97); }
 
-  /* Confetti canvas */
   #confetti {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     pointer-events: none; z-index: 9999;
   }
 
-  /* Animations */
   @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
   @keyframes slideUp {
     from { opacity: 0; transform: translateY(24px); }
@@ -249,7 +236,6 @@
   
   .hidden { display: none !important; }
 
-  /* Remove number input spinners */
   input[type=number]::-webkit-inner-spin-button,
   input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
   input[type=number] { -moz-appearance: textfield; }
@@ -257,7 +243,6 @@
 </head>
 <body>
 
-<!-- Honeycomb SVG Background -->
 <svg class="honeycomb-bg" viewBox="0 0 400 900" preserveAspectRatio="xMidYMid slice" id="honeycombSvg">
   <g stroke="#8B6914" fill="none" stroke-width="1" id="honeycombGroup"></g>
 </svg>
@@ -292,21 +277,17 @@
 <canvas id="confetti"></canvas>
 
 <div class="container">
-  <!-- Header -->
   <div class="header">
     <div class="header-label">✦ Izlet v neznano ✦</div>
     <h1>Kam gremo?</h1>
     <p>Reši naloge in odkrij cilj potovanja!</p>
   </div>
 
-  <!-- Progress -->
   <div class="progress-wrap"><div class="progress-bar" id="progressBar" style="width:0%"></div></div>
-  <div class="progress-text" id="progressText">0 / 15 števk odkritih</div>
+  <div class="progress-text" id="progressText">0 / 10 števk odkritih</div>
 
-  <!-- Coordinates -->
   <div class="coords" id="coordsDisplay"></div>
 
-  <!-- Task Card -->
   <div class="task-card" id="taskCard">
     <div class="task-header">
       <span class="task-emoji" id="taskEmoji"></span>
@@ -321,7 +302,6 @@
     <div id="feedbackArea"></div>
   </div>
 
-  <!-- Final Reveal -->
   <div class="reveal hidden" id="revealArea"></div>
 </div>
 
@@ -329,10 +309,11 @@
 // ═══════════════════════════════════════════
 //  QUIZ DATA
 // ═══════════════════════════════════════════
-// Target: 45.95404, 14.744131
-// Digit indices: 0=4, 1=5, 2=9, 3=5, 4=4, 5=0, 6=4, 7=1, 8=4, 9=7, 10=4, 11=4, 12=1, 13=3, 14=1
+// Target: 45.954, 14.744
+// Digits: 0=4, 1=5, 2=9, 3=5, 4=4, 5=1, 6=4, 7=7, 8=4, 9=4
 
-const TARGET = ["4","5","9","5","4","0","4","1","4","7","4","4","1","3","1"];
+const TOTAL_DIGITS = 10;
+const TARGET = ["4","5","9","5","4","1","4","7","4","4"];
 
 const TASKS = [
   {
@@ -343,115 +324,83 @@ const TASKS = [
     correct: "Na Dolenjsko", digits: [0],
   },
   {
-    emoji: "🔤", category: "ČRKE", type: "input",
-    question: "Koliko črk ima beseda KRANJ?",
+    emoji: "🗺️", category: "POTOVANJE", type: "choice",
+    question: "Katera trditev najbolj drži za to pot?",
     detail: null,
-    correctValue: "5", digits: [1],
+    options: ["Večino časa se pelješ ob morju", "Prečkaš državno mejo", "Pelješ se mimo glavnega mesta"],
+    correct: "Pelješ se mimo glavnega mesta", digits: [1],
   },
   {
-    emoji: "🏛️", category: "GEOGRAFIJA", type: "input",
-    question: "Koliko črk ima ime glavnega mesta Slovenije?",
+    emoji: "🚇", category: "PREDOR", type: "choice",
+    question: "Kateri predor je NAJMANJ povezan s to potjo?",
     detail: null,
-    correctValue: "9", digits: [2],
+    options: ["Trojanski predor", "Šentviški predor", "Kratki mestni tuneli"],
+    correct: "Trojanski predor", digits: [2],
   },
   {
-    emoji: "🗺️", category: "POTOVANJE", type: "input",
-    question: "Koliko črk ima beseda IZLET?",
+    emoji: "🍑", category: "NARAVA", type: "choice",
+    question: "Kaj je značilno za koščičasto sadje?",
     detail: null,
-    correctValue: "5", digits: [3],
-  },
-  {
-    emoji: "🚗", category: "OPAZOVANJE", type: "choice",
-    question: "Koliko koles ima vaš avto?",
-    detail: null,
-    options: ["3", "4", "6"],
-    correct: "4", digits: [4],
-  },
-  {
-    emoji: "🌊", category: "ŠTETJE", type: "input",
-    question: "Koliko jezer vidite z avtoceste med Kranjem in Ljubljano?",
-    detail: null,
-    correctValue: "0", digits: [5],
+    options: ["Ima veliko majhnih semen", "Ima eno veliko koščico v sredini", "Nima semen"],
+    correct: "Ima eno veliko koščico v sredini", digits: [3],
   },
   {
     emoji: "🎵", category: "GLASBA", type: "audio",
     question: "Kdo poje to pesem?",
     detail: "Pritisni ▶ in poslušaj!",
     audioSrc: "sounds/clip.m4a",
-    correctValue: "marko vozelj", digits: [6],
+    correctWords: ["marko", "vozelj"],
+    digits: [4],
   },
   {
-    emoji: "🚇", category: "PREDOR", type: "choice",
-    question: "Koliko predorov prevozite od Kranja do Ljubljane?",
+    emoji: "🌳", category: "UGANKA", type: "choice",
+    question: "Kaj od naštetega se skriva v imenu prve postojanke?",
     detail: null,
-    options: ["0", "1", "3"],
-    correct: "1", digits: [7],
+    options: ["Nekaj, kar raste na drevesu", "Nekaj, kar plava v morju", "Nekaj, kar leti po zraku"],
+    correct: "Nekaj, kar raste na drevesu", digits: [5],
   },
   {
-    emoji: "🪟", category: "OPAZOVANJE", type: "choice",
-    question: "Koliko stranskih oken ima vaš avto?",
+    emoji: "🏔️", category: "UGANKA", type: "choice",
+    question: "Kateri opis je najbolj pravilen?",
     detail: null,
-    options: ["2", "4", "6"],
-    correct: "4", digits: [8],
+    options: ["Ime kraja vsebuje barvo in reko", "Ime kraja vsebuje dve živali", "Ime kraja vsebuje nekaj užitnega in nekaj \"visokega\""],
+    correct: "Ime kraja vsebuje nekaj užitnega in nekaj \"visokega\"", digits: [6],
   },
   {
-    emoji: "🌈", category: "SPLOŠNO ZNANJE", type: "choice",
-    question: "Koliko barv ima mavrica?",
+    emoji: "🐝", category: "ČEBELE", type: "input",
+    question: "Koliko oči ima čebela (skupaj)?",
     detail: null,
-    options: ["5", "6", "7"],
-    correct: "7", digits: [9],
+    correctValue: "5", digits: [7],
   },
   {
-    emoji: "🍀", category: "NARAVA", type: "choice",
-    question: "Koliko letnih časov pozna narava?",
+    emoji: "🐝", category: "ČEBELE", type: "input",
+    question: "Koliko nog ima čebela?",
     detail: null,
-    options: ["3", "4", "5"],
-    correct: "4", digits: [10],
+    correctValue: "6", digits: [8],
   },
   {
-    emoji: "🔢", category: "RAČUNANJE", type: "input",
-    question: "Na poti prevozite skupaj 3 predore. Prištej 1.",
+    emoji: "🐝", category: "ČEBELE", type: "input",
+    question: "Koliko parov kril ima čebela?",
     detail: null,
-    correctValue: "4", digits: [11],
-  },
-  {
-    emoji: "🌍", category: "SLOVENIJA", type: "choice",
-    question: "Na koliko morij ima Slovenija obalo?",
-    detail: null,
-    options: ["0", "1", "2"],
-    correct: "1", digits: [12],
-  },
-  {
-    emoji: "🚦", category: "OPAZOVANJE", type: "choice",
-    question: "Koliko barv ima semafor?",
-    detail: null,
-    options: ["2", "3", "4"],
-    correct: "3", digits: [13],
-  },
-  {
-    emoji: "🏁", category: "ZADNJA NALOGA", type: "choice",
-    question: "Koliko voznikov ima vaš avto?",
-    detail: null,
-    options: ["1", "2", "3"],
-    correct: "1", digits: [14],
+    correctValue: "2", digits: [9],
   },
 ];
 
-// Coordinate template layout
+// Coordinate template layout for 45.954, 14.744
 const COORD_LAYOUT = [
   {t:"d",i:0},{t:"d",i:1},{t:"."},
-  {t:"d",i:2},{t:"d",i:3},{t:"d",i:4},{t:"d",i:5},{t:"d",i:6},
+  {t:"d",i:2},{t:"d",i:3},{t:"d",i:4},
   {t:","},
-  {t:"d",i:7},{t:"d",i:8},{t:"."},
-  {t:"d",i:9},{t:"d",i:10},{t:"d",i:11},{t:"d",i:12},{t:"d",i:13},{t:"d",i:14},
+  {t:"d",i:5},{t:"d",i:6},{t:"."},
+  {t:"d",i:7},{t:"d",i:8},{t:"d",i:9},
 ];
 
 // ═══════════════════════════════════════════
 //  STATE
 // ═══════════════════════════════════════════
 let currentTask = 0;
-let revealedDigits = Array(15).fill(null);
-let feedback = null; // null | "correct" | "wrong"
+let revealedDigits = Array(TOTAL_DIGITS).fill(null);
+let feedback = null;
 let isLocked = false;
 
 // ═══════════════════════════════════════════
@@ -460,7 +409,7 @@ let isLocked = false;
 function buildCoords() {
   const el = document.getElementById('coordsDisplay');
   el.innerHTML = '';
-  COORD_LAYOUT.forEach((item, idx) => {
+  COORD_LAYOUT.forEach((item) => {
     if (item.t === '.') {
       const s = document.createElement('span');
       s.className = 'coord-sep';
@@ -498,8 +447,8 @@ function updateCoords(justFilledDigits) {
 
 function updateProgress() {
   const solved = revealedDigits.filter(d => d !== null).length;
-  document.getElementById('progressBar').style.width = (solved / 15 * 100) + '%';
-  document.getElementById('progressText').textContent = solved + ' / 15 števk odkritih';
+  document.getElementById('progressBar').style.width = (solved / TOTAL_DIGITS * 100) + '%';
+  document.getElementById('progressText').textContent = solved + ' / ' + TOTAL_DIGITS + ' števk odkritih';
 }
 
 function renderTask() {
@@ -611,7 +560,6 @@ function renderTask() {
     row.appendChild(btn);
     interaction.appendChild(row);
 
-    // Auto-focus on mobile-friendly way
     setTimeout(() => input.focus(), 100);
   }
 }
@@ -629,7 +577,16 @@ function handleChoice(value) {
 function handleInput(value) {
   if (isLocked) return;
   const t = TASKS[currentTask];
-  const isCorrect = value.toLowerCase().trim() === t.correctValue.toLowerCase().trim();
+  let isCorrect = false;
+
+  if (t.type === 'audio' && t.correctWords) {
+    // Contains check: input must contain ALL required words (case-insensitive)
+    const lower = value.toLowerCase().trim();
+    isCorrect = t.correctWords.every(word => lower.includes(word));
+  } else {
+    isCorrect = value.toLowerCase().trim() === t.correctValue.toLowerCase().trim();
+  }
+
   processAnswer(isCorrect, value, t);
 }
 
@@ -637,7 +594,6 @@ function processAnswer(isCorrect, value, t) {
   isLocked = true;
 
   if (isCorrect) {
-    // Highlight correct option
     if (t.type === 'choice') {
       document.querySelectorAll('.option-btn').forEach(btn => {
         btn.disabled = true;
@@ -645,9 +601,7 @@ function processAnswer(isCorrect, value, t) {
       });
     }
 
-    // Reveal digits
-    const digitValue = t.correctDigit || t.correct || t.correctValue;
-    t.digits.forEach((pos, i) => {
+    t.digits.forEach((pos) => {
       revealedDigits[pos] = TARGET[pos];
     });
     updateCoords(t.digits);
@@ -668,17 +622,14 @@ function processAnswer(isCorrect, value, t) {
     document.getElementById('taskCard').classList.add('shake');
     showFeedback('wrong');
 
-    // Disable interaction during cooldown
     document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
     const inp = document.getElementById('answerInput');
     if (inp) { inp.disabled = true; }
     const sbtn = document.getElementById('submitBtn');
     if (sbtn) { sbtn.disabled = true; }
-    // Pause audio if playing
     const aud = document.querySelector('#taskInteraction audio');
     if (aud) { aud.pause(); }
 
-    // 15-second countdown
     let remaining = 15;
     const feedbackDiv = document.querySelector('.feedback.wrong');
     const countdownInterval = setInterval(() => {
@@ -692,7 +643,6 @@ function processAnswer(isCorrect, value, t) {
       isLocked = false;
       document.getElementById('taskCard').classList.remove('shake');
       document.getElementById('feedbackArea').innerHTML = '';
-      // Re-enable interaction
       document.querySelectorAll('.option-btn').forEach(btn => btn.disabled = false);
       const inp2 = document.getElementById('answerInput');
       if (inp2) {
@@ -744,7 +694,7 @@ function startReveal() {
           Mestni trg 2, 1294 Višnja Gora<br>
           Interaktivni muzej · Kavarna · Prenočišča v obliki panja
         </div>
-        <a href="https://maps.google.com/?q=45.95404,14.744131" target="_blank" class="maps-btn">
+        <a href="https://maps.google.com/?q=45.954,14.744" target="_blank" class="maps-btn">
           📍 Odpri v Google Maps
         </a>
       </div>

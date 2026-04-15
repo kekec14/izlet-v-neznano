@@ -248,6 +248,25 @@
     <p>Poglej sliko in ugani besedo.<br>Vpiši črke v polja spodaj.</p>
   </div>
 
+      <!-- Help button (appears after 2 minutes) -->
+  <div id="helpSection" style="text-align: center; margin-top: 24px; display: none; animation: fadeIn 0.8s ease;">
+    <button id="helpBtn" onclick="showHint()" style="
+      font-family: 'Playfair Display', Georgia, serif;
+      font-size: 15px;
+      font-weight: 700;
+      color: #8B6914;
+      background: rgba(139,105,20,0.08);
+      border: 2px solid rgba(139,105,20,0.25);
+      border-radius: 10px;
+      padding: 12px 28px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      letter-spacing: 0.5px;
+    " onmouseover="this.style.background='rgba(139,105,20,0.15)'" onmouseout="this.style.background='rgba(139,105,20,0.08)'">
+      Potrebujem pomoč.
+    </button>
+  </div>
+
   <!-- Puzzle 1: Dobrote -->
   <div class="puzzle-card" id="card1">
     <div class="check-mark">✓</div>
@@ -582,24 +601,7 @@
     </div>
   </div>
 
-  <!-- Help button (appears after 2 minutes) -->
-  <div id="helpSection" style="text-align: center; margin-top: 24px; display: none; animation: fadeIn 0.8s ease;">
-    <button id="helpBtn" onclick="showHint()" style="
-      font-family: 'Playfair Display', Georgia, serif;
-      font-size: 15px;
-      font-weight: 700;
-      color: #8B6914;
-      background: rgba(139,105,20,0.08);
-      border: 2px solid rgba(139,105,20,0.25);
-      border-radius: 10px;
-      padding: 12px 28px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      letter-spacing: 0.5px;
-    " onmouseover="this.style.background='rgba(139,105,20,0.15)'" onmouseout="this.style.background='rgba(139,105,20,0.08)'">
-      Potrebujem pomoč.
-    </button>
-  </div>
+
 
   <div class="footer">✦ REBUS ✦</div>
 </div>
@@ -742,7 +744,16 @@
       inp1.value = 'T';
       state[0].value[5] = 't';
       inp1.classList.add('correct');
-      inp1.disabled = true;
+      inp1.disabled = false;
+      checkSolved(0);
+    }
+    // T is the 6th letter of "dobrote" (index 0)
+    if (!state[0].solved) {
+      var inp3 = getInput(0, 0);
+      inp3.value = 'D';
+      state[0].value[0] = 'd';
+      inp3.classList.add('correct');
+      inp3.disabled = false;
       checkSolved(0);
     }
 
@@ -752,7 +763,17 @@
       inp2.value = 'S';
       state[1].value[6] = 's';
       inp2.classList.add('correct');
-      inp2.disabled = true;
+      inp2.disabled = false;
+      checkSolved(1);
+    }
+
+    // T is the 6th letter of "dobrote" (index 0)
+    if (!state[1].solved) {
+      var inp4 = getInput(1, 0);
+      inp4.value = 'D';
+      state[1].value[0] = 'd';
+      inp4.classList.add('correct');
+      inp4.disabled = false;
       checkSolved(1);
     }
   };

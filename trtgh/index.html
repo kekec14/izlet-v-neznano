@@ -41,18 +41,18 @@
   /* Header */
   .header { text-align: center; margin-bottom: 24px; }
   .header-label {
-    font-size: 14px;
-    letter-spacing: 6px;
+    font-size: 11px;
+    letter-spacing: 5px;
     text-transform: uppercase;
     color: #8B6914;
-    margin-bottom: 8px;
-    opacity: 0.7;
+    margin-bottom: 10px;
+    opacity: 0.75;
   }
   .header h1 {
-    font-size: 42px;
+    font-size: 32px;
     font-weight: 900;
     color: #3a2a10;
-    letter-spacing: 2px;
+    letter-spacing: 1px;
     text-shadow: 1px 1px 0 rgba(212,160,80,0.3);
   }
   .header-line {
@@ -106,6 +106,11 @@
     max-width: 400px;
     display: block;
     margin: 0 auto;
+  }
+  /* First puzzle illustration: compact to keep victory coords in view on solve */
+  #card1 .illustration {
+    max-width: 300px;
+    max-height: 210px;
   }
 
   /* Letter inputs */
@@ -198,37 +203,29 @@
 
   .footer {
     text-align: center;
-    margin-top: 40px;
-    font-size: 12px;
+    margin-top: 48px;
+    padding-top: 20px;
+    font-size: 11px;
     color: #8B6914;
-    opacity: 0.4;
-    letter-spacing: 2px;
+    opacity: 0.5;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(139,105,20,0.15);
   }
 
-  /* Confetti */
-  .confetti-container {
+  /* Confetti canvas (unified across pages) */
+  #confetti {
     position: fixed;
-    inset: 0;
+    top: 0; left: 0;
+    width: 100%;
+    height: 100%;
     pointer-events: none;
-    z-index: 999;
-    display: none;
-  }
-  .confetti-container.show { display: block; }
-  .confetti-piece {
-    position: absolute;
-    top: -20px;
-    border-radius: 2px;
-    opacity: 0;
-    animation: confettiFall ease-in forwards;
+    z-index: 9999;
   }
 
   @keyframes fadeIn {
     from { opacity: 0; transform: translateY(10px); }
     to   { opacity: 1; transform: translateY(0); }
-  }
-  @keyframes confettiFall {
-    0%   { transform: translateY(0) rotate(0deg); opacity: 1; }
-    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
   }
 
   input::selection { background: rgba(212,160,80,0.3); }
@@ -236,14 +233,15 @@
 </head>
 <body>
 
-<!-- Confetti -->
-<div class="confetti-container" id="confetti"></div>
+<!-- Confetti canvas -->
+<canvas id="confetti"></canvas>
 
 <div class="container">
 
   <!-- Header -->
   <div class="header">
-    <h1>R E B U S</h1>
+    <div class="header-label">✦ Izlet v neznano ✦</div>
+    <h1>Rebus</h1>
     <div class="header-line"></div>
     <p>Poglej sliko in ugani besedo.<br>Vpiši črke v polja spodaj.</p>
   </div>
@@ -596,14 +594,14 @@
       <a href="https://www.google.com/maps?q=45.90795640474024,15.008666711045088" target="_blank" rel="noopener noreferrer"
          style="display: inline-block; margin-top: 14px; padding: 12px 28px; background: #2a7a3a; color: #fff; text-decoration: none; border-radius: 10px; font-size: 15px; font-weight: 700; font-style: normal; letter-spacing: 1px; transition: background 0.3s ease; box-shadow: 0 3px 12px rgba(42,122,58,0.3);"
          onmouseover="this.style.background='#238a3a'" onmouseout="this.style.background='#2a7a3a'">
-        🗺️ Odpri v Google Maps
+        📍 Odpri v Google Maps
       </a>
     </div>
   </div>
 
 
 
-  <div class="footer">✦ REBUS ✦</div>
+  <div class="footer">✦ Izlet v neznano ✦</div>
 </div>
 
 <script>
@@ -704,23 +702,52 @@
   }
 
   function launchConfetti() {
-    const container = document.getElementById('confetti');
-    container.classList.add('show');
-    const colors = ['#e74c3c','#f39c12','#2ecc71','#3498db','#9b59b6','#e91e63','#ff9800'];
-    for (let i = 0; i < 60; i++) {
-      const piece = document.createElement('div');
-      piece.className = 'confetti-piece';
-      const size = 6 + Math.random() * 8;
-      piece.style.left = (Math.random() * 100) + '%';
-      piece.style.width = size + 'px';
-      piece.style.height = (size * 0.6) + 'px';
-      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
-      piece.style.animationDuration = (2 + Math.random() * 3) + 's';
-      piece.style.animationDelay = (Math.random() * 2) + 's';
-      piece.style.transform = 'rotate(' + (Math.random() * 360) + 'deg)';
-      container.appendChild(piece);
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Colors tuned for this page's palette (gold/cream/green)
+    const colors = ['#d4a050','#8B6914','#e8d5b0','#f5edd6','#2ecc71','#b8860b','#c08830','#ffd700'];
+    const particles = [];
+
+    for (let i = 0; i < 180; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 10 + 4,
+        h: Math.random() * 6 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 5,
+        vy: Math.random() * 3 + 2,
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 12,
+        opacity: 1,
+      });
     }
-    setTimeout(function() { container.classList.remove('show'); }, 5500);
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      particles.forEach(p => {
+        if (p.opacity <= 0) return;
+        alive = true;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.06;
+        p.rot += p.rotSpeed;
+        if (p.y > canvas.height + 30) p.opacity -= 0.015;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive) requestAnimationFrame(animate);
+    }
+    animate();
   }
 
   // Init
@@ -732,7 +759,7 @@
     if (!state.every(s => s.solved)) {
       helpSection.style.display = 'block';
     }
-  }, 120000);
+  }, 90000);
 
   // Expose hint function globally — fills letters into the actual input fields
   window.showHint = function() {

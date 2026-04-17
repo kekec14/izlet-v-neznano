@@ -22,7 +22,52 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 2rem;
+    padding: 2rem 1.5rem;
+    width: 100%;
+    max-width: 520px;
+  }
+
+  /* Page header (unified across pages) */
+  .page-header {
+    text-align: center;
+    width: 100%;
+    margin-bottom: 2.5rem;
+  }
+  .page-header-label {
+    font-size: 11px;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    color: #c9a84c;
+    opacity: 0.8;
+    margin-bottom: 10px;
+  }
+  .page-header h1 {
+    font-family: 'Cormorant Garamond', Georgia, serif;
+    font-size: 32px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: #e4d5a0;
+    margin-bottom: 0.3rem;
+  }
+  .page-header-line {
+    width: 80px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, #c9a84c, transparent);
+    margin: 0.8rem auto 0;
+  }
+
+  /* Page footer (unified across pages) */
+  .page-footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: #c9a84c;
+    opacity: 0.5;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(201,168,76,0.15);
+    width: 100%;
   }
 
   /* Logo - hidden by default */
@@ -194,6 +239,13 @@
 </head>
 <body>
   <div class="wrap">
+    <!-- Page header (unified) -->
+    <div class="page-header">
+      <div class="page-header-label">✦ Izlet v neznano ✦</div>
+      <h1>Uganka</h1>
+      <div class="page-header-line"></div>
+    </div>
+
     <!-- Logo (hidden until Pomoč click) -->
     <div class="logo-frame">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="180" height="180">
@@ -223,7 +275,10 @@
     </div>
 
     <!-- Google Maps button (shown on solve) -->
-    <a class="maps-btn" id="mapsBtn" href="https://www.google.com/maps?q=45.74942072203754,15.036189801476914" target="_blank">Odpri v Google Maps</a>
+    <a class="maps-btn" id="mapsBtn" href="https://www.google.com/maps?q=45.74942072203754,15.036189801476914" target="_blank">📍 Odpri v Google Maps</a>
+
+    <!-- Page footer (unified) -->
+    <div class="page-footer">✦ Izlet v neznano ✦</div>
   </div>
 
   <canvas id="confetti"></canvas>
@@ -318,58 +373,54 @@
       checkSolved();
     });
 
-    // Confetti
+    // Confetti (unified engine across pages)
     function launchConfetti() {
       const canvas = document.getElementById('confetti');
       const ctx = canvas.getContext('2d');
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
 
-      const pieces = [];
+      // Colors tuned for this page's palette (gold/cream/rose)
       const colors = ['#c9a84c', '#d6275a', '#4a9e6a', '#b8a472', '#e4d5a0', '#ff6b8a', '#ffd700'];
+      const particles = [];
 
-      for (let i = 0; i < 150; i++) {
-        pieces.push({
+      for (let i = 0; i < 180; i++) {
+        particles.push({
           x: Math.random() * canvas.width,
-          y: Math.random() * -canvas.height,
-          w: Math.random() * 10 + 5,
-          h: Math.random() * 6 + 3,
+          y: Math.random() * canvas.height - canvas.height,
+          w: Math.random() * 10 + 4,
+          h: Math.random() * 6 + 2,
           color: colors[Math.floor(Math.random() * colors.length)],
+          vx: (Math.random() - 0.5) * 5,
           vy: Math.random() * 3 + 2,
-          vx: (Math.random() - 0.5) * 2,
           rot: Math.random() * 360,
-          rv: (Math.random() - 0.5) * 8
+          rotSpeed: (Math.random() - 0.5) * 12,
+          opacity: 1,
         });
       }
 
-      let frame = 0;
-      function draw() {
+      function animate() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         let alive = false;
-
-        pieces.forEach(p => {
-          if (p.y < canvas.height + 50) alive = true;
+        particles.forEach(p => {
+          if (p.opacity <= 0) return;
+          alive = true;
           p.x += p.vx;
           p.y += p.vy;
-          p.vy += 0.04;
-          p.rot += p.rv;
-
+          p.vy += 0.06;
+          p.rot += p.rotSpeed;
+          if (p.y > canvas.height + 30) p.opacity -= 0.015;
           ctx.save();
           ctx.translate(p.x, p.y);
           ctx.rotate(p.rot * Math.PI / 180);
+          ctx.globalAlpha = Math.max(0, p.opacity);
           ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
           ctx.restore();
         });
-
-        frame++;
-        if (alive && frame < 300) {
-          requestAnimationFrame(draw);
-        } else {
-          ctx.clearRect(0, 0, canvas.width, canvas.height);
-        }
+        if (alive) requestAnimationFrame(animate);
       }
-      draw();
+      animate();
     }
   </script>
 </body>

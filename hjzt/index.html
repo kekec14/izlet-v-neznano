@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Izlet v neznano — Sestavljanka</title>
+<meta name="theme-color" content="#1a1408">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700;800&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+  :root {
+    --gold: #C8A050;
+    --gold-light: #F5D680;
+    --gold-dark: #8B7340;
+    --ember: #D97740;
+    --brown-deep: #1a1408;
+    --brown-mid: #2d1f0a;
+    --brown-card: rgba(45,31,10,0.92);
+    --cream: #F5ECD7;
+    --cream-light: #FFF9EE;
+    --green: #4ecdc4;
+  }
+
+  body {
+    font-family: 'Source Sans 3', -apple-system, sans-serif;
+    background: linear-gradient(160deg, var(--brown-deep) 0%, var(--brown-mid) 40%, var(--brown-deep) 100%);
+    color: var(--cream);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  /* Subtle backdrop pattern — radial warm glow like a lantern */
+  .lantern-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    z-index: 0; pointer-events: none;
+    background:
+      radial-gradient(ellipse at 50% 30%, rgba(217,119,64,0.08) 0%, transparent 55%),
+      radial-gradient(ellipse at 20% 80%, rgba(200,160,80,0.05) 0%, transparent 50%);
+  }
+
+  .container {
+    position: relative; z-index: 1;
+    max-width: 480px; margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  /* Unified header (matches other pages) */
+  .header { text-align: center; margin-bottom: 20px; }
+  .header-label {
+    font-size: 11px; letter-spacing: 5px; color: var(--gold);
+    text-transform: uppercase; margin-bottom: 10px;
+  }
+  .header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px; font-weight: 800;
+    background: linear-gradient(135deg, var(--gold-light), var(--gold));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; letter-spacing: 1px;
+  }
+  .header p { color: var(--gold-dark); font-size: 13px; margin-top: 8px; }
+
+  /* Task card */
+  .task-card {
+    background: var(--brown-card);
+    border: 1px solid #4a3520;
+    border-radius: 16px;
+    padding: 22px 18px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+    margin-top: 12px;
+  }
+  .task-header {
+    display: flex; align-items: center; gap: 10px; margin-bottom: 14px;
+  }
+  .task-emoji { font-size: 28px; line-height: 1; }
+  .task-category {
+    font-size: 10px; letter-spacing: 3px; color: var(--gold);
+    text-transform: uppercase;
+  }
+  .task-sub { font-size: 11px; color: var(--gold-dark); }
+  .task-question {
+    font-size: 16px; line-height: 1.5; margin-bottom: 6px;
+    font-weight: 500; color: var(--cream);
+  }
+  .task-detail {
+    font-size: 13px; color: var(--gold-dark); font-style: italic;
+    margin-bottom: 16px;
+  }
+
+  /* Progress / moves counter */
+  .stats-row {
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 12px; color: var(--gold-dark);
+    margin-bottom: 14px;
+    letter-spacing: 0.5px;
+  }
+  .stats-row strong { color: var(--gold); font-weight: 700; }
+  .shuffle-btn {
+    background: transparent;
+    border: 1px solid rgba(200,160,80,0.35);
+    color: var(--gold);
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-family: inherit;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .shuffle-btn:hover, .shuffle-btn:active {
+    background: rgba(200,160,80,0.12);
+    border-color: var(--gold);
+  }
+
+  /* Help button (appears after 2 min) */
+  .help-row {
+    display: none;
+    text-align: center;
+    margin-top: 14px;
+    animation: fadeIn 0.8s ease;
+  }
+  .help-row.show { display: block; }
+  .help-btn {
+    background: rgba(217,119,64,0.1);
+    border: 1px solid rgba(217,119,64,0.4);
+    color: var(--ember);
+    padding: 10px 22px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-family: inherit;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .help-btn:hover, .help-btn:active {
+    background: rgba(217,119,64,0.18);
+    border-color: var(--ember);
+  }
+
+  /* Puzzle board */
+  .board-wrap {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+    aspect-ratio: 1 / 1;
+    background: rgba(26,20,8,0.8);
+    border: 2px solid #4a3520;
+    border-radius: 14px;
+    padding: 8px;
+    box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 6px 24px rgba(0,0,0,0.3);
+  }
+  .board {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(0,0,0,0.4);
+  }
+  .tile {
+    position: absolute;
+    width: calc(100% / 3);
+    height: calc(100% / 3);
+    transition: left 0.25s ease, top 0.25s ease;
+    cursor: pointer;
+    overflow: hidden;
+    border: 1px solid rgba(26,20,8,0.6);
+    box-sizing: border-box;
+    background-repeat: no-repeat;
+    background-size: 300% 300%;
+  }
+  .tile.empty {
+    cursor: default;
+    background: transparent;
+    border: none;
+  }
+  .tile.correct {
+    filter: brightness(1.08) saturate(1.1);
+  }
+
+  /* Solved reveal */
+  .reveal {
+    margin-top: 28px;
+    text-align: center;
+    display: none;
+  }
+  .reveal.show { display: block; animation: fadeIn 0.6s ease; }
+  .reveal-step { animation: slideUp 0.6s ease both; }
+  .reveal-big-emoji { font-size: 52px; margin-bottom: 8px; }
+  .reveal-title {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px; font-weight: 700;
+    background: linear-gradient(135deg, var(--gold-light), var(--ember));
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  .reveal-card {
+    background: linear-gradient(135deg, rgba(200,160,80,0.12), var(--brown-card));
+    border: 2px solid var(--gold); border-radius: 20px;
+    padding: 24px 20px; box-shadow: 0 0 40px rgba(217,119,64,0.2);
+    animation: scaleIn 0.6s cubic-bezier(0.34,1.56,0.64,1) both;
+    margin-top: 20px;
+  }
+  .reveal-photo-wrap {
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 16px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 2px solid var(--gold);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+    aspect-ratio: 3/2;
+    background: #000;
+  }
+  .reveal-photo {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+  .reveal-name {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px; color: var(--gold-light); font-weight: 700;
+    margin: 8px 0 2px;
+  }
+  .reveal-place { font-size: 15px; color: var(--gold); margin-bottom: 4px; }
+  .reveal-address { font-size: 13px; color: var(--gold-dark); line-height: 1.5; margin-bottom: 18px; }
+  .reveal-quote {
+    font-size: 13px; color: var(--cream); font-style: italic;
+    line-height: 1.6; margin: 14px 0 18px;
+    opacity: 0.85;
+  }
+  .coords-line {
+    font-size: 14px; color: var(--gold); margin-bottom: 14px;
+    letter-spacing: 0.5px; font-weight: 600;
+  }
+  .maps-btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 14px 28px; border-radius: 14px; border: none;
+    background: linear-gradient(135deg, var(--gold), #D4B060, #E8C44A);
+    color: var(--brown-deep); font-weight: bold; font-size: 16px;
+    cursor: pointer; font-family: inherit;
+    box-shadow: 0 4px 16px rgba(200,160,80,0.4);
+    text-decoration: none;
+  }
+  .maps-btn:active { transform: scale(0.97); }
+
+  /* Confetti canvas (unified) */
+  #confetti {
+    position: fixed; top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none; z-index: 9999;
+  }
+
+  /* Unified footer */
+  .page-footer {
+    margin-top: 48px;
+    padding-top: 20px;
+    text-align: center;
+    font-size: 11px;
+    color: var(--gold);
+    opacity: 0.5;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    border-top: 1px solid rgba(200,160,80,0.15);
+  }
+
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.8); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  @keyframes celebratePulse {
+    0%, 100% { box-shadow: inset 0 0 20px rgba(0,0,0,0.5), 0 6px 24px rgba(0,0,0,0.3); }
+    50% { box-shadow: inset 0 0 20px rgba(217,119,64,0.3), 0 6px 40px rgba(217,119,64,0.4); }
+  }
+  .board-wrap.solved {
+    animation: celebratePulse 1.2s ease;
+    border-color: var(--ember);
+  }
+
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<div class="lantern-bg"></div>
+<canvas id="confetti"></canvas>
+
+<div class="container">
+  <div class="header">
+    <div class="header-label">✦ Izlet v neznano ✦</div>
+    <h1>Kje bomo spali?</h1>
+    <p>Sestavi sliko in odkrij naše skrivno prenočišče.</p>
+  </div>
+
+  <div class="task-card">
+    <div class="task-header">
+      <span class="task-emoji">🏡</span>
+      <div>
+        <div class="task-category">Zadnja uganka</div>
+        <div class="task-sub">Ognjišče nas že čaka</div>
+      </div>
+    </div>
+    <div class="task-question">Sestavljanka</div>
+    <div class="task-detail">Pritisni na ploščico ob praznem polju, da jo premakneš. Ko bo slika sestavljena, se bo razkril naš cilj.</div>
+
+    <div class="stats-row">
+      <span>Potez: <strong id="moves">0</strong></span>
+      <button class="shuffle-btn" id="shuffleBtn">↻ Premešaj</button>
+    </div>
+
+    <div class="board-wrap" id="boardWrap">
+      <div class="board" id="board"></div>
+    </div>
+
+    <div class="help-row" id="helpRow">
+      <button class="help-btn" id="helpBtn">✨ Pomagaj mi sestaviti</button>
+    </div>
+  </div>
+
+  <div class="reveal" id="revealArea"></div>
+
+  <div class="page-footer">✦ Izlet v neznano ✦</div>
+</div>
+
+<!-- Hidden SVG illustration (source for puzzle tiles) -->
+<svg id="puzzleSource" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 300" style="display:none">
+  <defs>
+    <!-- Night sky gradient -->
+    <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#1a2438"/>
+      <stop offset="60%" stop-color="#2d1f2a"/>
+      <stop offset="100%" stop-color="#3a2418"/>
+    </linearGradient>
+    <!-- Moon glow -->
+    <radialGradient id="moonGlow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#F5ECD7" stop-opacity="0.9"/>
+      <stop offset="40%" stop-color="#F5ECD7" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#F5ECD7" stop-opacity="0"/>
+    </radialGradient>
+    <!-- House wall -->
+    <linearGradient id="wallGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#EDE0C4"/>
+      <stop offset="100%" stop-color="#C9B68E"/>
+    </linearGradient>
+    <!-- Roof -->
+    <linearGradient id="roofGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#6B3418"/>
+      <stop offset="100%" stop-color="#3F1D0A"/>
+    </linearGradient>
+    <!-- Window glow -->
+    <radialGradient id="windowGlow" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#FFDA7A"/>
+      <stop offset="70%" stop-color="#D97740"/>
+      <stop offset="100%" stop-color="#8B4518"/>
+    </radialGradient>
+    <!-- Grass -->
+    <linearGradient id="grassGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2d3a1f"/>
+      <stop offset="100%" stop-color="#1a2410"/>
+    </linearGradient>
+    <!-- Smoke -->
+    <linearGradient id="smokeGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#5a5042" stop-opacity="0.6"/>
+      <stop offset="100%" stop-color="#5a5042" stop-opacity="0"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Sky background -->
+  <rect x="0" y="0" width="300" height="300" fill="url(#skyGrad)"/>
+
+  <!-- Stars -->
+  <g fill="#F5ECD7">
+    <circle cx="30" cy="40" r="1.2" opacity="0.9"/>
+    <circle cx="68" cy="25" r="0.8" opacity="0.7"/>
+    <circle cx="110" cy="50" r="1.4" opacity="0.8"/>
+    <circle cx="165" cy="30" r="0.9" opacity="0.7"/>
+    <circle cx="220" cy="55" r="1.1" opacity="0.85"/>
+    <circle cx="260" cy="35" r="0.8" opacity="0.7"/>
+    <circle cx="285" cy="70" r="1" opacity="0.8"/>
+    <circle cx="15" cy="90" r="0.7" opacity="0.6"/>
+    <circle cx="92" cy="75" r="1" opacity="0.75"/>
+    <circle cx="192" cy="80" r="0.9" opacity="0.7"/>
+    <circle cx="245" cy="90" r="0.7" opacity="0.65"/>
+    <!-- Twinkle stars with 4 points -->
+    <path d="M 50 15 L 51 19 L 55 20 L 51 21 L 50 25 L 49 21 L 45 20 L 49 19 Z" opacity="0.9"/>
+    <path d="M 140 70 L 141 74 L 145 75 L 141 76 L 140 80 L 139 76 L 135 75 L 139 74 Z" opacity="0.85"/>
+  </g>
+
+  <!-- Moon with glow -->
+  <circle cx="240" cy="60" r="35" fill="url(#moonGlow)" opacity="0.6"/>
+  <circle cx="240" cy="60" r="16" fill="#F5ECD7"/>
+  <circle cx="236" cy="56" r="3" fill="#D4C8A8" opacity="0.5"/>
+  <circle cx="244" cy="63" r="2" fill="#D4C8A8" opacity="0.4"/>
+
+  <!-- Distant hills (forest silhouette) -->
+  <path d="M 0 180 Q 40 155 80 170 T 160 165 T 240 170 T 300 160 L 300 220 L 0 220 Z" fill="#1e1a14" opacity="0.9"/>
+  <!-- Tree tips on hills -->
+  <g fill="#141008" opacity="0.85">
+    <polygon points="25,168 22,178 28,178"/>
+    <polygon points="55,160 51,175 59,175"/>
+    <polygon points="90,165 87,175 93,175"/>
+    <polygon points="125,162 121,175 129,175"/>
+    <polygon points="170,160 166,175 174,175"/>
+    <polygon points="205,168 202,178 208,178"/>
+    <polygon points="260,158 256,173 264,173"/>
+  </g>
+
+  <!-- Ground / meadow -->
+  <rect x="0" y="220" width="300" height="80" fill="url(#grassGrad)"/>
+
+  <!-- Path leading to house -->
+  <path d="M 150 300 Q 145 270 148 240 L 152 240 Q 155 270 150 300 Z" fill="#5a4a30" opacity="0.6"/>
+
+  <!-- Chimney smoke -->
+  <path d="M 205 60 Q 200 50 210 40 Q 220 30 212 18 Q 205 8 215 0" stroke="url(#smokeGrad)" stroke-width="8" fill="none" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Tree left -->
+  <g>
+    <rect x="42" y="185" width="6" height="45" fill="#3a2818"/>
+    <circle cx="45" cy="180" r="22" fill="#1a2410"/>
+    <circle cx="38" cy="175" r="15" fill="#243818" opacity="0.85"/>
+    <circle cx="52" cy="172" r="13" fill="#1e2e14" opacity="0.85"/>
+  </g>
+
+  <!-- House body -->
+  <!-- Main wall -->
+  <rect x="95" y="155" width="130" height="90" fill="url(#wallGrad)"/>
+  <!-- Roof (triangle) -->
+  <polygon points="85,155 160,100 235,155" fill="url(#roofGrad)"/>
+  <!-- Roof line / detail -->
+  <line x1="85" y1="155" x2="235" y2="155" stroke="#2a1408" stroke-width="2"/>
+  <!-- Roof tiles hint -->
+  <g stroke="#2a1408" stroke-width="0.5" opacity="0.4">
+    <line x1="100" y1="140" x2="220" y2="140"/>
+    <line x1="110" y1="125" x2="210" y2="125"/>
+    <line x1="125" y1="110" x2="195" y2="110"/>
+  </g>
+
+  <!-- Chimney -->
+  <rect x="195" y="105" width="16" height="30" fill="#6b4a30"/>
+  <rect x="193" y="103" width="20" height="5" fill="#4a301a"/>
+
+  <!-- Window 1 (glowing warm) -->
+  <rect x="110" y="175" width="34" height="34" fill="#2a1408" stroke="#6b3418" stroke-width="2"/>
+  <rect x="113" y="178" width="28" height="28" fill="url(#windowGlow)"/>
+  <!-- Window cross -->
+  <line x1="127" y1="178" x2="127" y2="206" stroke="#3a1d0a" stroke-width="1.5"/>
+  <line x1="113" y1="192" x2="141" y2="192" stroke="#3a1d0a" stroke-width="1.5"/>
+  <!-- Window glow halo -->
+  <rect x="108" y="173" width="38" height="38" fill="none" stroke="#D97740" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Window 2 (glowing warm) -->
+  <rect x="176" y="175" width="34" height="34" fill="#2a1408" stroke="#6b3418" stroke-width="2"/>
+  <rect x="179" y="178" width="28" height="28" fill="url(#windowGlow)"/>
+  <line x1="193" y1="178" x2="193" y2="206" stroke="#3a1d0a" stroke-width="1.5"/>
+  <line x1="179" y1="192" x2="207" y2="192" stroke="#3a1d0a" stroke-width="1.5"/>
+  <rect x="174" y="173" width="38" height="38" fill="none" stroke="#D97740" stroke-width="0.5" opacity="0.4"/>
+
+  <!-- Door -->
+  <rect x="148" y="200" width="24" height="45" fill="#3a1d0a" stroke="#2a1408" stroke-width="1.5"/>
+  <rect x="151" y="203" width="18" height="35" fill="#5a2e18"/>
+  <circle cx="166" cy="223" r="1.2" fill="#C8A050"/>
+  <!-- Door lantern -->
+  <circle cx="180" cy="212" r="3" fill="#FFDA7A" opacity="0.9"/>
+  <circle cx="180" cy="212" r="6" fill="#FFDA7A" opacity="0.25"/>
+
+  <!-- Small bushes near house -->
+  <g fill="#1e2e14">
+    <circle cx="95" cy="242" r="8"/>
+    <circle cx="102" cy="240" r="6"/>
+    <circle cx="230" cy="242" r="8"/>
+    <circle cx="222" cy="240" r="6"/>
+  </g>
+
+  <!-- Tree right -->
+  <g>
+    <rect x="262" y="195" width="5" height="35" fill="#3a2818"/>
+    <circle cx="264" cy="190" r="17" fill="#1a2410"/>
+    <circle cx="258" cy="186" r="11" fill="#243818" opacity="0.85"/>
+    <circle cx="270" cy="184" r="10" fill="#1e2e14" opacity="0.85"/>
+  </g>
+
+  <!-- Fireflies / warm dots -->
+  <g fill="#FFDA7A">
+    <circle cx="70" cy="210" r="1.2" opacity="0.8"/>
+    <circle cx="250" cy="215" r="1" opacity="0.7"/>
+    <circle cx="80" cy="225" r="0.9" opacity="0.75"/>
+    <circle cx="240" cy="230" r="1.1" opacity="0.8"/>
+  </g>
+
+  <!-- Ground foreground / grass detail -->
+  <g stroke="#3a4a28" stroke-width="0.8" opacity="0.6">
+    <line x1="10" y1="260" x2="10" y2="255"/>
+    <line x1="25" y1="268" x2="25" y2="263"/>
+    <line x1="60" y1="275" x2="60" y2="270"/>
+    <line x1="90" y1="280" x2="90" y2="275"/>
+    <line x1="200" y1="272" x2="200" y2="267"/>
+    <line x1="230" y1="275" x2="230" y2="270"/>
+    <line x1="270" y1="280" x2="270" y2="275"/>
+  </g>
+</svg>
+
+<script>
+(function() {
+  const SIZE = 3; // 3x3 grid
+  const TOTAL = SIZE * SIZE;
+  const EMPTY = TOTAL - 1; // index of the empty tile (last position = 8)
+  const board = document.getElementById('board');
+  const boardWrap = document.getElementById('boardWrap');
+  const movesEl = document.getElementById('moves');
+  const shuffleBtn = document.getElementById('shuffleBtn');
+
+  // tiles[i] = which piece index (0..EMPTY) is currently at position i
+  // Solved state: tiles[i] = i for all i
+  let tiles = [];
+  let moves = 0;
+  let solved = false;
+
+  // Get the SVG source as a serialized string and convert to data URL
+  const svgSource = document.getElementById('puzzleSource');
+  // Clone to avoid mutating the source, remove display:none before serializing
+  const svgClone = svgSource.cloneNode(true);
+  svgClone.removeAttribute('style');
+  svgClone.removeAttribute('id');
+  svgClone.setAttribute('preserveAspectRatio', 'xMidYMid slice');
+  const svgString = new XMLSerializer().serializeToString(svgClone);
+  // btoa requires latin1-safe string; SVG uses only ASCII here so it's fine
+  const svgDataUrl = 'url("data:image/svg+xml;base64,' + btoa(svgString) + '")';
+
+  function createTiles() {
+    board.innerHTML = '';
+    for (let i = 0; i < TOTAL; i++) {
+      const tile = document.createElement('div');
+      tile.className = 'tile';
+      tile.dataset.piece = i; // which piece this tile shows (0..8)
+
+      if (i === EMPTY) {
+        tile.classList.add('empty');
+      } else {
+        // Show only this piece's portion of the SVG by offsetting the background
+        const row = Math.floor(i / SIZE);
+        const col = i % SIZE;
+        // background-position: 0% 0% = top-left piece, 50% 0% = middle-top, 100% 0% = top-right, etc.
+        const bgX = (col / (SIZE - 1)) * 100;
+        const bgY = (row / (SIZE - 1)) * 100;
+        tile.style.backgroundImage = svgDataUrl;
+        tile.style.backgroundPosition = bgX + '% ' + bgY + '%';
+      }
+
+      tile.addEventListener('click', () => onTileClick(i));
+      board.appendChild(tile);
+    }
+  }
+
+  function positionTiles() {
+    // tiles[pos] = piece at position pos
+    // Find which DOM tile holds each piece and position it
+    const domTiles = Array.from(board.children);
+    tiles.forEach((pieceIdx, pos) => {
+      const domTile = domTiles.find(el => parseInt(el.dataset.piece) === pieceIdx);
+      if (!domTile) return;
+      const row = Math.floor(pos / SIZE);
+      const col = pos % SIZE;
+      domTile.style.left = `${col * 100 / SIZE}%`;
+      domTile.style.top = `${row * 100 / SIZE}%`;
+      // Mark correctness for subtle visual
+      if (pieceIdx === pos && pieceIdx !== EMPTY) {
+        domTile.classList.add('correct');
+      } else {
+        domTile.classList.remove('correct');
+      }
+    });
+  }
+
+  function emptyPosition() {
+    return tiles.indexOf(EMPTY);
+  }
+
+  function canSwap(pos) {
+    const emptyPos = emptyPosition();
+    const r1 = Math.floor(pos / SIZE), c1 = pos % SIZE;
+    const r2 = Math.floor(emptyPos / SIZE), c2 = emptyPos % SIZE;
+    return (r1 === r2 && Math.abs(c1 - c2) === 1) || (c1 === c2 && Math.abs(r1 - r2) === 1);
+  }
+
+  function swap(pos) {
+    const emptyPos = emptyPosition();
+    [tiles[pos], tiles[emptyPos]] = [tiles[emptyPos], tiles[pos]];
+  }
+
+  function onTileClick(pieceIdx) {
+    if (solved) return;
+    // Find the position of the clicked piece
+    const pos = tiles.indexOf(pieceIdx);
+    if (pieceIdx === EMPTY) return;
+    if (!canSwap(pos)) return;
+
+    swap(pos);
+    moves++;
+    movesEl.textContent = moves;
+    positionTiles();
+    checkSolved();
+  }
+
+  function checkSolved() {
+    for (let i = 0; i < TOTAL; i++) {
+      if (tiles[i] !== i) return;
+    }
+    // Solved!
+    solved = true;
+    boardWrap.classList.add('solved');
+    // Small delay, then reveal
+    setTimeout(() => {
+      showReveal();
+      launchConfetti();
+    }, 600);
+  }
+
+  // Shuffle by making many valid random moves (guarantees solvability)
+  function shuffle() {
+    tiles = Array.from({ length: TOTAL }, (_, i) => i); // solved state
+    const steps = 120;
+    let lastMoved = -1;
+    for (let s = 0; s < steps; s++) {
+      const emptyPos = emptyPosition();
+      const r = Math.floor(emptyPos / SIZE), c = emptyPos % SIZE;
+      const neighbors = [];
+      if (r > 0) neighbors.push(emptyPos - SIZE);
+      if (r < SIZE - 1) neighbors.push(emptyPos + SIZE);
+      if (c > 0) neighbors.push(emptyPos - 1);
+      if (c < SIZE - 1) neighbors.push(emptyPos + 1);
+      // Avoid immediate reversal
+      const choices = neighbors.filter(n => n !== lastMoved);
+      const pick = choices[Math.floor(Math.random() * choices.length)];
+      lastMoved = emptyPos;
+      [tiles[emptyPos], tiles[pick]] = [tiles[pick], tiles[emptyPos]];
+    }
+    // Safety: if accidentally solved, swap two non-empty tiles
+    let allCorrect = true;
+    for (let i = 0; i < TOTAL; i++) if (tiles[i] !== i) { allCorrect = false; break; }
+    if (allCorrect) {
+      [tiles[0], tiles[1]] = [tiles[1], tiles[0]];
+    }
+  }
+
+  shuffleBtn.addEventListener('click', function() {
+    if (solved) return;
+    shuffle();
+    moves = 0;
+    movesEl.textContent = '0';
+    positionTiles();
+  });
+
+  // Help button: appears after 2 minutes if unsolved
+  const helpBtn = document.getElementById('helpBtn');
+  const helpRow = document.getElementById('helpRow');
+  setTimeout(function() {
+    if (!solved) helpRow.classList.add('show');
+  }, 120000);
+
+  helpBtn.addEventListener('click', function() {
+    if (solved) return;
+    // Solve by setting all tiles to their correct positions
+    tiles = Array.from({ length: TOTAL }, (_, i) => i);
+    positionTiles();
+    helpRow.classList.remove('show');
+    // Trigger the same solved flow as a normal win
+    solved = true;
+    boardWrap.classList.add('solved');
+    setTimeout(() => {
+      showReveal();
+      launchConfetti();
+    }, 600);
+  });
+
+  function showReveal() {
+    const area = document.getElementById('revealArea');
+    area.classList.add('show');
+    area.innerHTML = `
+      <div class="reveal-step">
+        <div class="reveal-big-emoji">🔥</div>
+        <div class="reveal-title">Prispeli smo!</div>
+        <p style="color:var(--gold-dark);margin-top:8px;font-size:14px">V ${moves} potezah</p>
+      </div>
+      <div class="reveal-card">
+        <div class="reveal-photo-wrap">
+          <img class="reveal-photo" src="picture/domacija.jpg" alt="Domačija Krnc"
+               onerror="this.parentNode.innerHTML='<div style=&quot;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;color:var(--gold-dark);font-size:12px;padding:20px;text-align:center;gap:8px;&quot;><div style=&quot;font-size:32px;opacity:0.5;&quot;>🏡</div><div>Slika <code style=&quot;color:var(--gold);font-size:11px;&quot;>picture/domacija.jpg</code> ni najdena</div></div>'">
+        </div>
+        <div class="reveal-name">Domačija Krnc</div>
+        <div class="reveal-place">Hrib pri Hinjah</div>
+        <div class="reveal-address">
+          Hrib pri Hinjah 9, 8362 Hinje<br>
+        </div>
+        </div>        <div class="coords-line">📍 45.76735° N, 14.88889° E</div>
+        <a href="https://www.google.com/maps?q=45.76735293323659,14.888893835273285" target="_blank" class="maps-btn">
+          📍 Odpri v Google Maps
+        </a>
+      </div>
+    `;
+  }
+
+  // Confetti (unified engine across all pages)
+  function launchConfetti() {
+    const canvas = document.getElementById('confetti');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    // Colors tuned to this page's palette (gold/ember/cream)
+    const colors = ['#C8A050','#F5D680','#D97740','#F5ECD7','#8B7340','#FFDA7A','#E8C44A','#6B3418'];
+    const particles = [];
+
+    for (let i = 0; i < 180; i++) {
+      particles.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        w: Math.random() * 10 + 4,
+        h: Math.random() * 6 + 2,
+        color: colors[Math.floor(Math.random() * colors.length)],
+        vx: (Math.random() - 0.5) * 5,
+        vy: Math.random() * 3 + 2,
+        rot: Math.random() * 360,
+        rotSpeed: (Math.random() - 0.5) * 12,
+        opacity: 1,
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      let alive = false;
+      particles.forEach(p => {
+        if (p.opacity <= 0) return;
+        alive = true;
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vy += 0.06;
+        p.rot += p.rotSpeed;
+        if (p.y > canvas.height + 30) p.opacity -= 0.015;
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI / 180);
+        ctx.globalAlpha = Math.max(0, p.opacity);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+        ctx.restore();
+      });
+      if (alive) requestAnimationFrame(animate);
+    }
+    animate();
+  }
+
+  // Init
+  createTiles();
+  shuffle();
+  positionTiles();
+})();
+</script>
+</body>
+</html>
